@@ -10,6 +10,12 @@ var users = require('./routes/users');
 
 var app = express();
 
+var User = require('./models/user');
+var us = new User({email: 'nay@test.com'})
+console.log(us)
+us.save()
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
