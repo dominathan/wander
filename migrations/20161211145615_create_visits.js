@@ -1,9 +1,9 @@
 
 exports.up = function(knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('likes', function(t) {
+    knex.schema.createTable('visits', function(t) {
       t.increments('id').primary();
-      t.integer('likes_count').notNullable()
+      t.boolean('visited').notNullable()
       t.integer('user_id').references('id').inTable('users')
       t.integer('place_id').references('id').inTable('places')
     })
@@ -12,6 +12,6 @@ exports.up = function(knex, Promise) {
 
 exports.down = function(knex, Promise) {
   return Promise.all([
-    knex.schema.dropTable('likes')
+    knex.schema.dropTable('visits')
   ])
 };
