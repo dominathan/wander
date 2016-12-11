@@ -1,7 +1,7 @@
-var bookshelf = require('../config/bookshelf.config');
+var Bookshelf = require('../config/bookshelf.config');
 var Likes = require('./like')
 
-var Place = bookshelf.Model.extend({
+var Place = Bookshelf.Model.extend({
   tableName: 'places',
   likes: function() {
     return this.hasMany(Likes)

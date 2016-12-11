@@ -10,10 +10,15 @@ var users = require('./routes/users');
 
 var app = express();
 
+var Bookshelf = require('./config/bookshelf.config')
 var User = require('./models/user');
-var us = new User({email: 'nay@test.com'})
-console.log(us)
-us.save()
+
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+};
+
+app.use(allowCrossDomain);
 
 
 // view engine setup
