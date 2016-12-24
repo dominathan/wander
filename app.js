@@ -36,9 +36,8 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());
+app.use(cookieParser());
 app.use(passport.initialize());
-// app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', authController)
 
@@ -47,12 +46,8 @@ app.get('/',
     res.render('index.ejs', { user: req.user });
   });
 
-app.get('/login',
-  function(req, res){
-    res.render('login');
-  });
 
-app.get('/profile', passport.authenticate(),
+app.get('/profile', passport.authenticate('facebook-token'),
   function(req, res){
     res.render('profile', { user: req.user });
   });
