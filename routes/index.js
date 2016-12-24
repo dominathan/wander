@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var app = require('../app');
-var User = require('../models/user')
+// var LocalStrategy = require('passport-local');
+// var authConfig = require('../config/facebook.config');
+// var FacebookTokenStrategy = require('passport-facebook-token');
+var Users = require('../collections/users');
+var User = require('../models/user');
 
-User.fetchAll()
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
 
-module.exports = router;
+
+
+module.exports = router

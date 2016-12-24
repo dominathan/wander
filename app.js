@@ -5,11 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport')
-var FacebookStrategy = require('passport-facebook').Strategy;
-
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var authController = require('./controllers/authentication')
+
+var authConfig = require('./config/facebook.config');
+var User = require('./models/user');
+
 
 var app = express();
 
@@ -26,27 +29,33 @@ app.use(allowCrossDomain);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(passport.initialize());
 // app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', authController)
 
-app.use('/', routes);
-app.use('/users', users);
+app.get('/',
+  function(req, res) {
+    res.render('index.ejs', { user: req.user });
+  });
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+app.get('/login',
+  function(req, res){
+    res.render('login');
+  });
+
+app.get('/profile', passport.authenticate(),
+  function(req, res){
+    res.render('profile', { user: req.user });
+  });
 
 // error handlers
 

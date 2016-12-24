@@ -1,36 +1,67 @@
 var express = require('express');
 var router = express.Router();
+var authConfig = require('../config/facebook.config');
 var request = require('request');
+var jwt = require('jwt-simple')
 var moment = require('moment');
-var jwt = require('jwt-simple');
-var config = require('../config/config');
-var bcrypt = require('bcrypt');
-var ensureAuthenticated = require('../helpers/ensure_authenticated').ensureAuthenticated;
+// var FacebookTokenStrategy = require('passport-facebook-token');
+var Users = require('../collections/users');
+var User = require('../models/user');
+var qs = require('querystring')
+var createToken = require('../helpers/ensure_authenticated').createToken;
 
-// http://passportjs.org/docs#facebook
+router.route('/auth/facebook/callback')
+  .get(function(req, res, next) {
 
-router.route('/login').post(function(req, res, next) {
-  // knex('users').select('*').where('email', req.body.email).then(function(data) {
-  //   if (!data[0]) {
-  //     return res.status(401).send({
-  //       error: "Incorrect email/or password"
-  //     });
-  //   }
-  //   bcrypt.compare(req.body.password, data[0].password, function(err, isMatch) {
-  //     if (!isMatch) {
-  //       return res.status(401).send({
-  //         error: "Incorrect email/or password"
-  //       });
-  //     }
-  //     var payload = {
-  //       email: data[0].email,
-  //       username: data[0].username,
-  //       id: data[0].id
-  //     }
-  //     res.send({
-  //       token: createToken(payload),
-  //       username: data[0].username
-  //     })
-  //   })
-  // })
-});
+    var accessTokenUrl = 'https://graph.facebook.com/oauth/access_token';
+    var graphApiUrl = 'https://graph.facebook.com/me';
+    var params = {
+      code: res.req.url.split('?code=')[1],
+      client_id: authConfig.facebookAuth.clientID,
+      client_secret: authConfig.facebookAuth.clientSecret,
+      redirect_uri: authConfig.facebookAuth.callbackUrl
+    };
+
+    // Step 1. Exchange authorization code for access token.
+    request.get({ url: accessTokenUrl, qs: params, json: true }, function(err, response, accessToken) {
+      if (response.statusCode !== 200) {
+        return res.status(500).send({ message: accessToken.error.message });
+      }
+      accessToken = qs.parse(accessToken);
+      // Step 2. Retrieve profile information about the current user.
+      request.get({ url: graphApiUrl, qs: accessToken, json: true }, function(err, response, profile) {
+        if (response.statusCode !== 200) return res.status(500).send({ message: profile.error.message });
+        User.forge({
+          facebook_uuid: profile.id,
+        })
+        .fetch()
+        .then(function(user) {
+          if(user) {
+            console.log("user exists", user)
+            user.save({facebook_authentication_token: accessToken['access_token']})
+            res.send({ token: createToken(user)} )
+          } else {
+            User.forge({
+              first_name: profile.name.split(' ')[0],
+              last_name: profile.name.split(' ')[1],
+              facebook_authentication_token: accessToken['access_token'],
+              facebook_uuid: profile.id
+            })
+            .save()
+            .then(function(data) {
+              console.log("creating user", data)
+              res.send({ token: createToken(user)} )
+            })
+          }
+        })
+        .catch(function(err) {
+          console.log("FAILED TO SAVE USER", err)
+          next(err)
+        })
+
+      });
+    });
+  });
+
+
+module.exports = router

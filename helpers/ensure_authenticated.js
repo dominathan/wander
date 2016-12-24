@@ -1,5 +1,5 @@
 var jwt = require('jwt-simple');
-var config = require('../config/config');
+var config = require('../config/facebook.config')
 var moment = require('moment');
 /*
  |--------------------------------------------------------------------------
@@ -11,7 +11,7 @@ exports.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
     return res.status(401).send({ message: 'Please make sure your request has an Authorization header' });
   }
   var token = req.headers.authorization.split(' ')[1];
-  var payload = jwt.decode(token, config.TOKEN_SECRET);
+  var payload = jwt.decode(token, config.facebookAuth.clientSecret);
   if (payload.exp <= moment().unix()) {
     return res.status(401).send({ message: 'Token has expired' });
   }
@@ -25,12 +25,5 @@ exports.createToken = function createToken(user) {
     iat: moment().unix(),
     exp: moment().add(14, 'days').unix()
   };
-  return jwt.encode(payload, config.TOKEN_SECRET);
+  return jwt.encode(payload, config.facebookAuth.clientSecret);
 }
-
-exports.createTokenPassword = function(password) {
-  var payload = {
-    pass: password
-  };
-  return jwt.encode(payload, config.TOKEN_SECRET);
-};
