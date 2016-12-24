@@ -12,7 +12,7 @@ var createToken = require('../helpers/ensure_authenticated').createToken;
 
 router.route('/auth/facebook/callback')
   .get(function(req, res, next) {
-
+    console.log("REDIRECT: ", authConfig.facebookAuth.callbackUrl)
     var accessTokenUrl = 'https://graph.facebook.com/oauth/access_token';
     var graphApiUrl = 'https://graph.facebook.com/me';
     var params = {
