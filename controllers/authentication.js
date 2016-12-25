@@ -37,19 +37,19 @@ router.route('/auth/facebook/callback')
         .then(function(user) {
           if(user) {
             console.log("user exists", user)
-            // user.save({facebook_authentication_token: accessToken['access_token']})
+            user.save({facebook_authentication_token: accessToken})
             res.send({ token: createToken(user), profile: profile})
           } else {
             User.forge({
               first_name: profile.name.split(' ')[0],
               last_name: profile.name.split(' ')[1],
-              facebook_authentication_token: accessToken['access_token'],
+              facebook_authentication_token: accessToken,
               facebook_uuid: profile.id
             })
             .save()
             .then(function(data) {
               console.log("creating user", data)
-              res.send({ token: createToken(user)} )
+              res.send({ token: createToken(user), profile: profile})
             })
           }
         })
