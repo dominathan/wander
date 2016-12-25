@@ -28,11 +28,11 @@ router.route('/auth/facebook/callback')
     //   // Step 2. Retrieve profile information about the current user.
       request.get(graphApiUrl, function(err, response, profile) {
         if (response.statusCode !== 200) return res.status(500).send({ message: profile.error.message });
-
+        console.log("RESPON IS BIG: ", JSON.stringify(response))
         console.log('PROFILE INFO', profile);
-        console.log('PROFILE ID?', profile['id'])
+        console.log('PROFILE ID?', typeof profile)
         User.forge({
-          facebook_uuid: profile['id'],
+          facebook_uuid: profile,
         })
         .fetch()
         .then(function(user) {
