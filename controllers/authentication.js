@@ -37,7 +37,7 @@ router.route('/auth/facebook/callback')
         .then(function(user) {
           if(user) {
             console.log("user exists", user)
-            user.save({facebook_authentication_token: accessToken['access_token']})
+            // user.save({facebook_authentication_token: accessToken['access_token']})
             res.send({ token: createToken(user), profile: profile})
           } else {
             User.forge({
