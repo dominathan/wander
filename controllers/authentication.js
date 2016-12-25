@@ -15,7 +15,7 @@ router.route('/auth/facebook/callback')
     // console.log("REDIRECT: ", authConfig.facebookAuth.callbackUrl)
     // var accessTokenUrl = 'https://graph.facebook.com/oauth/access_token';
     var accessToken = req.body.accessToken
-    var graphApiUrl = 'https://graph.facebook.com/me?access_token=' + access_token;
+    var graphApiUrl = 'https://graph.facebook.com/me?access_token=' + accessToken;
 
     console.log("THIS IS ACCESS TOKEN", accessToken)
 
