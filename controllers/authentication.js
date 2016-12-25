@@ -30,6 +30,7 @@ router.route('/auth/facebook/callback')
         if (response.statusCode !== 200) return res.status(500).send({ message: profile.error.message });
 
         console.log('PROFILE INFO', profile);
+        console.log('PROFILE ID?', profile.id)
         User.forge({
           facebook_uuid: profile.id,
         })
