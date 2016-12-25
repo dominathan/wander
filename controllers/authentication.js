@@ -35,6 +35,7 @@ router.route('/auth/facebook/callback')
         })
         .fetch()
         .then(function(user) {
+          console.log("DID WE MAKE IT?", user)
           if(user) {
             console.log("user exists", user)
             user.save({facebook_authentication_token: accessToken})
